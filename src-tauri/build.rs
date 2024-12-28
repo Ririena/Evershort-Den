@@ -9,7 +9,7 @@ fn main() {
 
         // Rename the executable
         let old_path = Path::new("target/debug/markdown-editor.exe");
-        let new_path = Path::new("target/debug/Aero25x Template.exe");
+        let new_path = Path::new("target/debug/Evershort Den.exe");
 
         if old_path.exists() {
             match fs::rename(&old_path, &new_path) {

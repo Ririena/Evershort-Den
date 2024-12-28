@@ -1,7 +1,7 @@
 import "./App.css";
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api"; // Import invoke for Tauri commands
-import { Search, Plus, Trash2, Image, X } from "lucide-react";
+import { Search, Plus, Trash2, Image, X, Github, AArrowDown as Discord } from "lucide-react"; // Import Github icon
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AppCard from "./components/app-card";
@@ -10,6 +10,7 @@ import { ThemeProvider } from "./components/theme-provider";
 import { ModeToggle } from "./components/mode-toggle";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { open } from '@tauri-apps/api/dialog';
+import { Card } from "./components/ui/card";
 
 interface App {
   id: number;
@@ -247,6 +248,19 @@ export const App = () => {
             ))}
           </div>
         </div>
+        <div className="fixed bottom-16 right-4 flex flex-col space-y-2">
+        <a href="https://github.com/Ririena/Evershort-Den" target="_blank" rel="noopener noreferrer" className="no-underline">
+  <Card className="p-4 flex items-center space-x-2">
+    <Github className="h-6 w-6" />
+    <span>Checkout My Repository</span>
+  </Card>
+</a>
+        </div>
+        <footer className="fixed bottom-0 left-0 right-0 text-center py-4 bg-background/80 backdrop-blur-sm">
+          <p className="text-sm text-muted-foreground">
+            Made with ❤️ by YueLin
+          </p>
+        </footer>
         <AddAppModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={addAppFromModal} />
         {appToDelete && (
           <Dialog open={true} onOpenChange={() => setAppToDelete(null)}>
