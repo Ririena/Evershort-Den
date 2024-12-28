@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { invoke } from '@tauri-apps/api/tauri'
+import { open } from '@tauri-apps/api/dialog'
+
 interface AddAppModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -26,6 +28,19 @@ export default function AddAppModal({ isOpen, onClose, onAdd }: AddAppModalProps
       alert(`Failed to fetch icon: ${error}`);
     }
   }
+
+  const handleFileSelect = async () => {
+    try {
+      const selectedPath = await open({
+        filters: [{ name: 'Executables', extensions: ['exe'] }]
+      });
+      if (selectedPath) {
+        setPath(selectedPath as string);
+      }
+    } catch (error) {
+      alert(`Failed to select file: ${error}`);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -51,8 +66,10 @@ export default function AddAppModal({ isOpen, onClose, onAdd }: AddAppModalProps
               onChange={(e) => setPath(e.target.value)}
               required
             />
+            <h1 className='text-center mt-4'>Or Select File</h1>
+            <Button className='w-full mt-4' type="button" variant="outline" onClick={handleFileSelect}>Select File</Button>
           </div>
-          <Button type="submit">Add App</Button>
+          <Button type="submit" className='w-full'>Add App</Button>
         </form>
       </DialogContent>
     </Dialog>

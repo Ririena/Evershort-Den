@@ -9,7 +9,6 @@ import AddAppModal from "./components/add-app-modal";
 import { ThemeProvider } from "./components/theme-provider";
 import { ModeToggle } from "./components/mode-toggle";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useDropzone } from 'react-dropzone';
 
 interface App {
   id: number;
@@ -135,21 +134,7 @@ export const App = () => {
     app.name.toLowerCase().includes(searchTerm.toLowerCase())
   ));
 
-  const onDrop = (acceptedFiles: File[]) => {
-    console.log("Files dropped:", acceptedFiles);
-    for (const file of acceptedFiles) {
-      console.log("Processing file:", file);
-      if (file.name.endsWith('.exe')) {
-        const name = file.name.replace('.exe', '');
-        const path = file.webkitRelativePath || file.name;
-        console.log("Executable file detected:", { name, path });
-        setDroppedApp({ name: file.name, path });
-        setIsConfirmOpen(true); // Open the confirmation dialog
-      } else {
-        alert('Only .exe files are supported.');
-      }
-    }
-  };
+ 
 
   const handleConfirmAddDroppedApp = async () => {
     if (droppedApp) {
@@ -159,7 +144,6 @@ export const App = () => {
     }
   };
 
-  const { getRootProps, getInputProps } = useDropzone({ onDrop, multiple: false });
 
   return (
     <ThemeProvider>
@@ -190,10 +174,7 @@ export const App = () => {
             <Button onClick={() => setSortCriteria("latest-used")}>Sort by Latest Used</Button>
             <Button onClick={() => setSortCriteria("no-longer-used")}>Sort by No Longer Used</Button>
           </div>
-          <div {...getRootProps()} className="border-2 border-dashed border-gray-300 p-4 mb-6">
-            <input {...getInputProps()} />
-            <p>Drag 'n' drop an executable file here, or click to select one</p>
-          </div>
+        
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {filteredApps.map((app) => (
               <AppCard key={app.id} app={app} onLaunch={() => launchApp(app.name)} onDelete={() => confirmDeleteApp(app)} />
