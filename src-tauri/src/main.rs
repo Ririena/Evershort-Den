@@ -15,6 +15,8 @@ use image::codecs::png::PngEncoder;
 use image::ImageEncoder;
 use std::fs;
 use std::path::PathBuf;
+use std::fs::File;
+use std::io::Write;
 
 #[derive(Default)]
 struct AppManager {
@@ -166,12 +168,39 @@ fn get_default_icon() -> String {
     encode(default_icon)
 }
 
+#[tauri::command]
+fn set_wallpaper(path: String) -> Result<String, String> {
+    println!("Setting wallpaper with path: {}", path);
+    let wallpaper_path = PathBuf::from("data/wallpaper.txt");
+    let mut file = File::create(&wallpaper_path).map_err(|e| e.to_string())?;
+    file.write_all(path.as_bytes()).map_err(|e| e.to_string())?;
+    Ok("Wallpaper set successfully!".to_string())
+}
+
+#[tauri::command]
+fn remove_wallpaper() -> Result<String, String> {
+    println!("Removing wallpaper");
+    let wallpaper_path = PathBuf::from("data/wallpaper.txt");
+    if wallpaper_path.exists() {
+        fs::remove_file(&wallpaper_path).map_err(|e| e.to_string())?;
+    }
+    Ok("Wallpaper removed successfully!".to_string())
+}
+
 fn main() {
     let manager = AppManager::default();
 
     tauri::Builder::default()
         .manage(manager) // Share AppManager state across commands
-        .invoke_handler(tauri::generate_handler![add_app, add_app_from_drop, get_apps, launch_app, get_icon])
+        .invoke_handler(tauri::generate_handler![
+            add_app, 
+            add_app_from_drop, 
+            get_apps, 
+            launch_app, 
+            get_icon, 
+            set_wallpaper, 
+            remove_wallpaper
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

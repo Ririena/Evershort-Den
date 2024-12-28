@@ -1,7 +1,7 @@
 import "./App.css";
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api"; // Import invoke for Tauri commands
-import { Search, Plus, Trash2 } from "lucide-react";
+import { Search, Plus, Trash2, Image, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AppCard from "./components/app-card";
@@ -9,6 +9,7 @@ import AddAppModal from "./components/add-app-modal";
 import { ThemeProvider } from "./components/theme-provider";
 import { ModeToggle } from "./components/mode-toggle";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { open } from '@tauri-apps/api/dialog';
 
 interface App {
   id: number;
@@ -27,6 +28,18 @@ const loadAppsFromLocalStorage = (): App[] => {
   return apps ? JSON.parse(apps) : [];
 };
 
+const saveWallpaperToLocalStorage = (wallpaper: string | null) => {
+  if (wallpaper) {
+    localStorage.setItem("wallpaper", wallpaper);
+  } else {
+    localStorage.removeItem("wallpaper");
+  }
+};
+
+const loadWallpaperFromLocalStorage = (): string | null => {
+  return localStorage.getItem("wallpaper");
+};
+
 export const App = () => {
   const [apps, setApps] = useState<App[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,6 +48,7 @@ export const App = () => {
   const [sortCriteria, setSortCriteria] = useState<string>("name-asc");
   const [droppedApp, setDroppedApp] = useState<{ name: string; path: string } | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [wallpaper, setWallpaper] = useState<string | null>(loadWallpaperFromLocalStorage());
 
   useEffect(() => {
     const fetchApps = async () => {
@@ -58,6 +72,20 @@ export const App = () => {
       fetchApps();
     }
   }, []);
+
+  useEffect(() => {
+    if (wallpaper) {
+      const formattedWallpaper = wallpaper.startsWith('file://') ? wallpaper : `file://${wallpaper}`;
+      document.body.style.backgroundImage = `url(${formattedWallpaper})`;
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundColor = 'transparent';
+      document.body.classList.remove('bg-background', 'text-foreground'); // Remove default theme classes
+    } else {
+      document.body.style.backgroundImage = '';
+      document.body.style.backgroundColor = ''; // Revert to default theme
+      document.body.classList.add('bg-background', 'text-foreground'); // Add default theme classes
+    }
+  }, [wallpaper]);
 
   const addAppFromModal = async (newApp: { name: string; icon: string; path: string }) => {
     try {
@@ -144,6 +172,35 @@ export const App = () => {
     }
   };
 
+  const handleSetWallpaper = async () => {
+    try {
+      const selectedPath = await open({
+        filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png'] }]
+      });
+      if (selectedPath) {
+        const imageUrl = `file://${selectedPath}`;
+        console.log(`Selected wallpaper path: ${imageUrl}`);
+        await invoke('set_wallpaper', { path: imageUrl });
+        setWallpaper(imageUrl);
+        saveWallpaperToLocalStorage(imageUrl);
+      }
+    } catch (error) {
+      console.error(`Failed to select wallpaper: ${error}`);
+      alert(`Failed to select wallpaper: ${error}`);
+    }
+  };
+
+  const handleRemoveWallpaper = async () => {
+    try {
+      console.log("Removing wallpaper");
+      await invoke('remove_wallpaper');
+      setWallpaper(null);
+      saveWallpaperToLocalStorage(null);
+    } catch (error) {
+      console.error(`Failed to remove wallpaper: ${error}`);
+      alert(`Failed to remove wallpaper: ${error}`);
+    }
+  };
 
   return (
     <ThemeProvider>
@@ -151,8 +208,17 @@ export const App = () => {
         <div className="container mx-auto p-4">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">App Launcher</h1>
-            <ModeToggle />
+            <div className="flex space-x-2">
+              <ModeToggle />
+              <Button onClick={handleSetWallpaper} size="icon">
+                <Image className="h-4 w-4" />
+              </Button>
+              <Button onClick={handleRemoveWallpaper} size="icon">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
+       
           <div className="flex space-x-2 mb-6">
             <div className="relative flex-grow">
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
