@@ -15,8 +15,8 @@ export default defineConfig(async () => ({
     port: 1420,
     strictPort: true,
     watch: {
-      // 3. tell vite to ignore watching `src-tauri`
-      ignored: ["**/src-tauri/**"],
+      // 3. tell vite to ignore watching `src-tauri` and `data`
+      ignored: ["**/src-tauri/**", "**/data/**"],
     },
   },
   // 3. Custom alias defined in ts.config.json
@@ -25,4 +25,7 @@ export default defineConfig(async () => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    outDir: 'dist' // Ensure this matches the output directory in tauri.conf.json
+  }
 }));

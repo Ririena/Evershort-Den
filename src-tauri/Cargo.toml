@@ -9,11 +9,16 @@ edition = "2021"
 
 [build-dependencies]
 tauri-build = { version = "1", features = [] }
+winres = "0.1.11"
 
 [dependencies]
-tauri = { version = "1", features = [ "fs-write-file", "fs-read-file", "dialog-open", "shell-open"] }
+tauri = { version = "1", features = [ "process-all", "shell-open", "dialog-open", "fs-write-file", "fs-read-file"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+ico = "0.1.0"
+base64 = "0.13.0"
+image = "0.23.14"
+winapi = { version = "0.3", features = ["shellapi", "winuser"] }
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

@@ -1,0 +1,4 @@
+HoyoPlay:G:\Documents\Game\HoYoPlay\launcher.exe
+Google Chrome:C:\Program Files\Google\Chrome\Application\chrome.exe
+Google Chrome:C:\Program Files\Google\Chrome\Application\chrome.exe
+Google Chrome:C:\Program Files\Google\Chrome\Application\chrome.exe

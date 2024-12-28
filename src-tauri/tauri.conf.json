@@ -24,6 +24,9 @@
         "all": false,
         "readFile": true,
         "writeFile": true
+      },
+      "process": {
+        "all": true
       }
     },
     "windows": [
